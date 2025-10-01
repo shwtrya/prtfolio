@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Award, Trophy, Star, Target, Zap, Shield, CheckCircle, Rocket } from 'lucide-react';
+import { Award, Trophy, Star, Target, Zap, Shield, CircleCheck as CheckCircle, Rocket } from 'lucide-react';
 
 interface Badge {
   id: string;

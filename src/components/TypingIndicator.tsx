@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Edit3 } from 'lucide-react';
+import { CreditCard as Edit3 } from 'lucide-react';
 
 interface TypingIndicatorProps {
   isTyping: boolean;
