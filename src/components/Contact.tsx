@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Shield, Clock } from 'lucide-react';
+import TypingIndicator from './TypingIndicator';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,8 @@ const Contact: React.FC = () => {
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(() => {
     return parseInt(localStorage.getItem('lastSubmitTime') || '0');
   });
+  const [typingField, setTypingField] = useState<string | null>(null);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const COOLDOWN_TIME = 60000; // 1 menit
   const MAX_SUBMISSIONS_PER_HOUR = 3;
@@ -34,7 +37,20 @@ const Contact: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const fieldName = e.target.name;
+    setFormData({ ...formData, [fieldName]: e.target.value });
+
+    setTypingField(fieldName);
+
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    const timeout = setTimeout(() => {
+      setTypingField(null);
+    }, 1000);
+
+    setTypingTimeout(timeout);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -318,6 +334,7 @@ const Contact: React.FC = () => {
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 text-Sm sm:text-base border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Nama Anda"
                   />
+                  <TypingIndicator isTyping={typingField === 'name'} fieldName="nama" />
                 </div>
 
                 <div>
@@ -338,6 +355,7 @@ const Contact: React.FC = () => {
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="email.anda@example.com"
                   />
+                  <TypingIndicator isTyping={typingField === 'email'} fieldName="email" />
                 </div>
               </div>
 
@@ -359,6 +377,7 @@ const Contact: React.FC = () => {
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Tentang apa ini?"
                 />
+                <TypingIndicator isTyping={typingField === 'subject'} fieldName="subjek" />
               </div>
 
               <div>
@@ -379,6 +398,7 @@ const Contact: React.FC = () => {
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Ceritakan tentang proyek Anda..."
                 />
+                <TypingIndicator isTyping={typingField === 'message'} fieldName="pesan" />
               </div>
 
               <motion.button

@@ -13,6 +13,9 @@ import ScrollProgress from './components/ScrollProgress';
 import ParticleBackground from './components/ParticleBackground';
 import BackToTop from './components/BackToTop';
 import VisitorCounter from './components/VisitorCounter';
+import VCardDownload from './components/VCardDownload';
+import AchievementBadges from './components/AchievementBadges';
+import SkillRadarChart from './components/SkillRadarChart';
 
 // ⛔ ProtectedRoute DIHAPUS
 
@@ -58,6 +61,7 @@ function App() {
             <Footer />
             <BackToTop />
             <VisitorCounter />
+            <VCardDownload />
           </div>
         </Router>
       </ThemeProvider>
@@ -71,9 +75,11 @@ function HomePage() {
       <Hero />
       <About />
       <Skills />
+      <SkillRadarChart />
       <Experience />
       <Timeline />
       <Projects />
+      <AchievementBadges />
       <Education />
       <Contact />
     </motion.div>

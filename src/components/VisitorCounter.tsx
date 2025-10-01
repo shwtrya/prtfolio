@@ -1,31 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Eye, TrendingUp } from 'lucide-react';
+import { trackVisitor, getVisitorStats, subscribeToVisitorStats } from '../utils/visitorTracking';
 
 const VisitorCounter = () => {
   const [visitors, setVisitors] = useState(0);
   const [views, setViews] = useState(0);
-  const targetVisitors = 1247;
-  const targetViews = 3892;
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const visitorIncrement = targetVisitors / steps;
-    const viewIncrement = targetViews / steps;
-    let currentStep = 0;
+    const initializeStats = async () => {
+      await trackVisitor();
+      const stats = await getVisitorStats();
+      setVisitors(stats.visitors);
+      setViews(stats.views);
+      setIsLoading(false);
+    };
 
-    const timer = setInterval(() => {
-      currentStep++;
-      setVisitors(Math.min(Math.floor(visitorIncrement * currentStep), targetVisitors));
-      setViews(Math.min(Math.floor(viewIncrement * currentStep), targetViews));
+    initializeStats();
 
-      if (currentStep >= steps) {
-        clearInterval(timer);
-      }
-    }, duration / steps);
+    const unsubscribe = subscribeToVisitorStats((stats) => {
+      setVisitors(stats.visitors);
+      setViews(stats.views);
+    });
 
-    return () => clearInterval(timer);
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -33,12 +34,21 @@ const VisitorCounter = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="fixed bottom-4 right-4 z-40"
+      className="fixed bottom-4 right-4 z-40 max-w-[200px]"
     >
-      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 min-w-[200px]">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center mb-3">
-          <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Statistik</h3>
+          <div className="relative">
+            <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
+            {!isLoading && (
+              <motion.div
+                className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+              />
+            )}
+          </div>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Live Stats</h3>
         </div>
 
         <div className="space-y-3">
@@ -53,9 +63,9 @@ const VisitorCounter = () => {
               key={visitors}
               initial={{ scale: 1.2, color: '#3B82F6' }}
               animate={{ scale: 1, color: 'inherit' }}
-              className="text-sm font-bold text-gray-900 dark:text-white"
+              className="text-sm font-bold text-gray-900 dark:text-white tabular-nums"
             >
-              {visitors.toLocaleString()}
+              {isLoading ? '...' : visitors.toLocaleString()}
             </motion.span>
           </div>
 
@@ -72,9 +82,9 @@ const VisitorCounter = () => {
               key={views}
               initial={{ scale: 1.2, color: '#10B981' }}
               animate={{ scale: 1, color: 'inherit' }}
-              className="text-sm font-bold text-gray-900 dark:text-white"
+              className="text-sm font-bold text-gray-900 dark:text-white tabular-nums"
             >
-              {views.toLocaleString()}
+              {isLoading ? '...' : views.toLocaleString()}
             </motion.span>
           </div>
         </div>
